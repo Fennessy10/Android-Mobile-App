@@ -73,7 +73,7 @@ fun PreviewSimpleButton() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         FirstValue()
-        Spacer(modifier = Modifier.height(20.dp)) // Space between components
+        Spacer(modifier = Modifier.height(20.dp)) // Space between components/elements
         Operation()
     }
 }
