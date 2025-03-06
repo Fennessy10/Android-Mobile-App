@@ -15,6 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 
+// Define CompositionLocals to hold shared state
+val LocalFirstValue = compositionLocalOf { mutableIntStateOf(1) }
+val LocalSecondValue = compositionLocalOf { mutableIntStateOf(1) }
+val LocalOperation = compositionLocalOf { mutableStateOf("+") }
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,38 +36,67 @@ class MainActivity : ComponentActivity() {
                 FirstValue() // First component
                 Spacer(modifier = Modifier.height(20.dp)) // Add some space between components
                 Operation() // Second component
+                Spacer(modifier = Modifier.height(20.dp))
+                SecondValue();
+                Spacer(modifier = Modifier.height(20.dp))
+                Text("=")
+                Spacer(modifier = Modifier.height(20.dp))
+                Result()
             }
         }
     }
 }
 
 @Composable
+fun Result() {
+    val firstValue = LocalFirstValue.current.value
+    val secondValue = LocalSecondValue.current.value
+    val operation = LocalOperation.current.value
+
+    val result = when (operation) {
+        "+" -> firstValue + secondValue
+        "-" -> firstValue - secondValue
+        else -> 0
+    }
+
+    Text(text = result.toString())
+}
+
+@Composable
 fun FirstValue() {
-    var count by remember { mutableIntStateOf(1) } // State to remember the count
+    val firstValue = LocalFirstValue.current
 
     Button(onClick = {
-        count++;
+        firstValue.value++ // Increment shared state
     }) {
-        Text(count.toString());
+        Text(firstValue.value.toString())
+    }
+}
+
+@Composable
+fun SecondValue() {
+    val secondValue = LocalSecondValue.current
+
+    Button(onClick = {
+        secondValue.value++ // Increment shared state
+    }) {
+        Text(secondValue.value.toString())
     }
 }
 
 @Composable
 fun Operation() {
-    var operation by remember { mutableStateOf("+") }
+    val operation = LocalOperation.current
 
     Button(onClick = {
-        if (operation == "+"){
-            operation = "-"
-        } else if (operation == "-"){
-            operation = "+"
-        } else {
-            error("operation broke")
-        }
+        operation.value = if (operation.value == "+") "-" else "+"
     }) {
-        Text(operation)
+        Text(operation.value)
     }
 }
+
+
+
 
 @Preview(showBackground = true)
 @Composable
