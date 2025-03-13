@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -35,7 +36,8 @@ class MainActivity : ComponentActivity() { // Welcome Screen
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
                         NutritrackTitle()
-                        Spacer(modifier = Modifier.height(10.dp))
+//                        Spacer(modifier = Modifier.height(10.dp))
+                        NutriTrackImage()
 
 
                     }
@@ -58,5 +60,10 @@ fun NutritrackTitle(){
 
 @Composable
 fun NutriTrackImage(){
+    androidx.compose.foundation.Image(
+        painter = painterResource(id = R.drawable.nutritracklogo),
+        contentDescription = "nutritracklogo",
+        modifier = Modifier.size(400.dp)
+    )
 
 }
