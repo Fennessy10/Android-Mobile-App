@@ -13,6 +13,11 @@
         android:theme="@style/Theme.MyFirstApplication"
         tools:targetApi="31">
         <activity
+            android:name=".FoodIntakeQuestionnaire"
+            android:exported="false"
+            android:label="@string/title_activity_food_intake_questionnaire"
+            android:theme="@style/Theme.MyFirstApplication" />
+        <activity
             android:name=".Login"
             android:exported="false"
             android:label="@string/title_activity_login"
