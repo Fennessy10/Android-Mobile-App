@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.ui.Alignment
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 
 class FoodIntakeQuestionnaire : ComponentActivity() {
@@ -35,7 +38,15 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
         setContent {
             MyFirstApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TopMenuBar()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+
+                    }
                 }
             }
         }
@@ -43,34 +54,31 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
 }
 
 @Composable
-fun TopMenuBar() {
-    var expanded by remember { mutableStateOf(false) }
+fun Title(){
 
-    Box(modifier = Modifier.padding(16.dp)) {
-        IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Edit") },
-                onClick = { /* Handle edit! */ },
-                leadingIcon = { Icon(Icons.Outlined.Edit, contentDescription = null) }
-            )
-            DropdownMenuItem(
-                text = { Text("Settings") },
-                onClick = { /* Handle settings! */ },
-                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) }
-            )
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text("Send Feedback") },
-                onClick = { /* Handle send feedback! */ },
-                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
-                trailingIcon = { Text("F11") }
-            )
-        }
-    }
+}
+
+@Composable
+fun FoodCategories(){
+
+}
+
+@Composable
+fun PersonaView(){
+
+}
+
+@Composable
+fun PersonaDropdown(){
+
+}
+
+@Composable
+fun Timings(){
+
+}
+
+@Composable
+fun SaveButton(){
+
 }
