@@ -19,7 +19,7 @@ class Login : ComponentActivity() {
         setContent {
             MyFirstApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(usernameStatic, passwordStatic).Screen()
+                    LoginScreen("", "").Screen()
                 }
             }
         }

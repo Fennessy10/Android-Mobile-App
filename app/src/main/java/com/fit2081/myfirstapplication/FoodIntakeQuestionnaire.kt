@@ -2,13 +2,22 @@ package com.fit2081.myfirstapplication
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -24,12 +33,35 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode.Companion.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
+
+
 
 class FoodIntakeQuestionnaire : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +77,7 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
-
+                        TopAppBar()
                     }
                 }
             }
@@ -53,19 +85,258 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
     }
 }
 
-@Composable
-fun Title(){
+//@Composable
+//fun Title(){
+//    Text(
+//        "Food Intake Questionnaire",
+//        style = TextStyle(
+//            fontSize = (20.sp),
+//            fontWeight = (FontWeight.Bold)
+//        )
+//    )
+//}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar() {
+    // Create a TopAppBarState object to control the behavior of the TopAppBar.
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    // The onBackPressedDispatcher is used to handle the back button press in the app.
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    // Use Scaffold to structure the layout and place the TopAppBar at the top
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                // Customize the appearance of the TopAppBar
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                // Title displayed in the center of the app bar
+                title = {
+                    Text(
+                        "Food Intake Questionnaire",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                // Navigation icon (back button)
+                navigationIcon = {
+                    IconButton(onClick = {
+                        // Handle back button press
+                        onBackPressedDispatcher?.onBackPressed()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+                // Action icons (currently empty)
+                actions = {
+                    // DropdownMenu() // Uncomment and implement if needed
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        }
+    ) { innerPadding ->
+        // Main content of the screen
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            FoodCategories()
+            PersonaView()
+        }
+    }
 }
 
 @Composable
-fun FoodCategories(){
+fun FoodCategories() {
+    var checkedFruits by remember { mutableStateOf(false) }
+    var checkedVegetables by remember { mutableStateOf(false) }
+    var checkedGrains by remember { mutableStateOf(false) }
+    var checkedRedMeat by remember { mutableStateOf(false) }
+    var checkedSeafood by remember { mutableStateOf(false) }
+    var checkedPoultry by remember { mutableStateOf(false) }
+    var checkedFish by remember { mutableStateOf(false) }
+    var checkedEggs by remember { mutableStateOf(false) }
+    var checkedNutsSeeds by remember { mutableStateOf(false) }
 
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            "Tick all the food categories you can eat",
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = checkedFruits, onCheckedChange = { checkedFruits = it })
+            Text("Fruits")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedVegetables, onCheckedChange = { checkedVegetables = it })
+            Text("Vegetables")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedGrains, onCheckedChange = { checkedGrains = it })
+            Text("Grains")
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = checkedRedMeat, onCheckedChange = { checkedRedMeat = it })
+            Text("Red Meat")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedSeafood, onCheckedChange = { checkedSeafood = it })
+            Text("Seafood")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedPoultry, onCheckedChange = { checkedPoultry = it })
+            Text("Poultry")
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = checkedFish, onCheckedChange = { checkedFish = it })
+            Text("Fish")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedEggs, onCheckedChange = { checkedEggs = it })
+            Text("Eggs")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedNutsSeeds, onCheckedChange = { checkedNutsSeeds = it })
+            Text("Nuts/Seeds")
+        }
+    }
+}
+
+
+
+@Composable
+fun PersonaView() {
+    var selectedPersona by remember { mutableStateOf<String?>(null) }
+    var selectedDescription by remember { mutableStateOf<String?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "Your Persona",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            "People can be broadly classified into 6 different types based on their eating preferences. Click on each button below to find out the different types, and select the type that best fits you!",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+
+        Row {
+            PersonaButton("Health Devotee", buttonColors) {
+                selectedPersona = "Health Devotee"
+                selectedDescription =
+                    "I'm passionate about healthy eating & health plays a big part in my life. I use social media to follow active lifestyle personalities or get new recipes/exercise ideas. I may even buy superfoods or follow a particular type of diet. I like to think I am super healthy."
+                showDialog = true
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            PersonaButton("Mindful Eater", buttonColors) {
+                selectedPersona = "Mindful Eater"
+                selectedDescription =
+                    "I pay close attention to what I eat and try to make balanced, nutritious choices. I am mindful of portion sizes and avoid overeating."
+                showDialog = true
+            }
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Row {
+            PersonaButton("Wellness Striver", buttonColors) {
+                selectedPersona = "Wellness Striver"
+                selectedDescription =
+                    "I am on a journey to improve my eating habits. I try to eat well, but I also allow myself indulgences without guilt."
+                showDialog = true
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            PersonaButton("Balance Seeker", buttonColors) {
+                selectedPersona = "Balance Seeker"
+                selectedDescription =
+                    "I believe in a balanced approach to eating. I enjoy all kinds of food but make sure I don’t overdo anything."
+                showDialog = true
+            }
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Row {
+            PersonaButton("Health Procrastinator", buttonColors) {
+                selectedPersona = "Health Procrastinator"
+                selectedDescription =
+                    "I want to eat healthier but often find myself putting it off. I may have some knowledge about good nutrition, but I don’t always apply it."
+                showDialog = true
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            PersonaButton("Food Carefree", buttonColors) {
+                selectedPersona = "Food Carefree"
+                selectedDescription =
+                    "I eat whatever I feel like without much concern for health aspects. I enjoy food for its taste and variety."
+                showDialog = true
+            }
+        }
+    }
+
+    if (showDialog && selectedPersona != null) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(
+                        painter = painterResource(id = getPersonaImageResource(selectedPersona)),
+                        contentDescription = "Persona Image",
+                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(selectedPersona!!, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
+            },
+            text = { Text(selectedDescription ?: "") },
+            confirmButton = {
+                Button(onClick = { showDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))) {
+                    Text("Dismiss", color = androidx.compose.ui.graphics.Color.White)
+                }
+            }
+        )
+    }
 }
 
 @Composable
-fun PersonaView(){
+fun PersonaButton(label: String, buttonColors: ButtonColors, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = buttonColors,
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Text(label, color = androidx.compose.ui.graphics.Color.White)
+    }
+}
 
+fun getPersonaImageResource(persona: String?): Int {
+    return when (persona) {
+        "Health Devotee" -> R.drawable.buddahicon
+        "Mindful Eater" -> R.drawable.mindfulicon
+        "Wellness Striver" -> R.drawable.wellnessicon
+        "Balance Seeker" -> R.drawable.balanceicon
+        "Health Procrastinator" -> R.drawable.procrastinateicon
+        "Food Carefree" -> R.drawable.carefreeicon
+        else -> R.drawable.nutritracklogo // Fallback image
+    }
 }
 
 @Composable
