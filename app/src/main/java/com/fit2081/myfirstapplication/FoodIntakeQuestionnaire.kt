@@ -1,11 +1,14 @@
 package com.fit2081.myfirstapplication
 
+import android.app.TimePickerDialog
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -47,17 +52,24 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 
@@ -99,22 +111,23 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar() {
-    // Create a TopAppBarState object to control the behavior of the TopAppBar.
+    // Create a scroll state for the content
+    val scrollState = rememberScrollState()
+
+    // Create scroll behavior for the app bar
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    // The onBackPressedDispatcher is used to handle the back button press in the app.
+    // Back button handler
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    // Use Scaffold to structure the layout and place the TopAppBar at the top
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
-                // Customize the appearance of the TopAppBar
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                // Title displayed in the center of the app bar
                 title = {
                     Text(
                         "Food Intake Questionnaire",
@@ -122,35 +135,30 @@ fun TopAppBar() {
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                // Navigation icon (back button)
                 navigationIcon = {
-                    IconButton(onClick = {
-                        // Handle back button press
-                        onBackPressedDispatcher?.onBackPressed()
-                    }) {
+                    IconButton(onClick = { onBackPressedDispatcher?.onBackPressed() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "back"
                         )
                     }
-                },
-                // Action icons (currently empty)
-                actions = {
-                    // DropdownMenu() // Uncomment and implement if needed
                 },
                 scrollBehavior = scrollBehavior,
             )
         }
     ) { innerPadding ->
-        // Main content of the screen
-        Box(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+                .verticalScroll(scrollState)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             FoodCategories()
             PersonaView()
+//            Timings()
+            Spacer(modifier = Modifier.height(16.dp))
+            SaveButton()
         }
     }
 }
@@ -172,7 +180,7 @@ fun FoodCategories() {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            "Tick all the food categories you can eat",
+            "Tick the food categories you can eat",
             style = TextStyle(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
@@ -185,9 +193,6 @@ fun FoodCategories() {
             Spacer(modifier = Modifier.width(16.dp))
             Checkbox(checked = checkedVegetables, onCheckedChange = { checkedVegetables = it })
             Text("Vegetables")
-            Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedGrains, onCheckedChange = { checkedGrains = it })
-            Text("Grains")
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -196,9 +201,6 @@ fun FoodCategories() {
             Spacer(modifier = Modifier.width(16.dp))
             Checkbox(checked = checkedSeafood, onCheckedChange = { checkedSeafood = it })
             Text("Seafood")
-            Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedPoultry, onCheckedChange = { checkedPoultry = it })
-            Text("Poultry")
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -210,6 +212,14 @@ fun FoodCategories() {
             Spacer(modifier = Modifier.width(16.dp))
             Checkbox(checked = checkedNutsSeeds, onCheckedChange = { checkedNutsSeeds = it })
             Text("Nuts/Seeds")
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = checkedGrains, onCheckedChange = { checkedGrains = it })
+            Text("Grains")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = checkedPoultry, onCheckedChange = { checkedPoultry = it })
+            Text("Poultry")
         }
     }
 }
@@ -344,12 +354,9 @@ fun PersonaDropdown(){
 
 }
 
-@Composable
-fun Timings(){
 
-}
+
 
 @Composable
 fun SaveButton(){
-
 }

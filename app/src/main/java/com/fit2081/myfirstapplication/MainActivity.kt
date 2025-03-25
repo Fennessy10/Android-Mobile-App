@@ -78,21 +78,18 @@ fun NutriTrackImage(){
 @Composable
 fun NutriTrackDescription(){
     Text(
-        "This app provides general health and nutrition information for\n" +
-                "educational purposes only. It is not intended as medical advice,\n" +
-                "diagnosis, or treatment. Always consult a qualified healthcare\n" +
-                "professional before making any changes to your diet, exercise, or\n" +
-                "health regimen.\n" +
-                "Use this app at your own risk.\n" +
-                "If you’d like to an Accredited Practicing Dietitian (APD), please\n" +
-                "visit the Monash Nutrition/Dietetics Clinic (discounted rates for\n" +
-                "students):\n" +
-                "https://www.monash.edu/medicine/scs/nutrition/clinics/nutrition",
-        style = TextStyle(
-            fontStyle = FontStyle.Italic
-        ),
+    "This app provides general health and nutrition information for\n" +
+        "educational purposes only. It is not intended as medical advice,\n" +
+        "diagnosis, or treatment. Always consult a qualified healthcare\n" +
+        "professional before making any changes to your diet, exercise, or\n" +
+        "health regimen.\n" +
+        "Use this app at your own risk.\n" +
+        "If you’d like to an Accredited Practicing Dietitian (APD), please\n" +
+        "visit the Monash Nutrition/Dietetics Clinic (discounted rates for\n" +
+        "students):\n" +
+        "https://www.monash.edu/medicine/scs/nutrition/clinics/nutrition",
+        style = TextStyle(fontStyle = FontStyle.Italic),
         textAlign = TextAlign.Center
-
     )
 }
 
