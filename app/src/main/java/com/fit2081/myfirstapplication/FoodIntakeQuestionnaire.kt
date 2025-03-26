@@ -1,6 +1,8 @@
 package com.fit2081.myfirstapplication
 
 import android.app.TimePickerDialog
+import android.widget.TimePicker
+import java.util.Calendar
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,6 +10,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -156,8 +159,11 @@ fun TopAppBar() {
         ) {
             FoodCategories()
             PersonaView()
-//            Timings()
-            Spacer(modifier = Modifier.height(16.dp))
+            PersonaDropdown()
+            Timings("What time of day do you normally eat your biggest meal?")
+            Timings("What time of day do you go to sleep at night?")
+            Timings("What time of day do you wake up in the morning?")
+            Spacer(modifier = Modifier.height(8.dp))
             SaveButton()
         }
     }
@@ -351,12 +357,93 @@ fun getPersonaImageResource(persona: String?): Int {
 
 @Composable
 fun PersonaDropdown(){
+    val options = listOf("Health Devotee", "Mindful Eater", "Wellness Striver", "Balance Seeker", "Health Procrastinator", "Food Carefree")
+    var expanded by remember { mutableStateOf(false) } // boolean for whether the dropdown is dropped or not
+    var selectedOption by remember { mutableStateOf(options[0]) } // remembers selected option
 
+    Row(
+        modifier = Modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text("Select your persona:")
+
+        Box {
+            Text(
+                text = selectedOption ?: "Click to select an option",
+                modifier = Modifier
+                    .clickable { expanded = true }
+                    .padding(16.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            selectedOption = option
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
 
+@Composable
+fun Timings(question: String) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
+    var timeText by remember { mutableStateOf("Click to Select Time") }
 
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _: TimePicker, hourOfDay: Int, minute: Int ->
+            timeText = String.format("%02d:%02d", hourOfDay, minute)
+        },
+        calendar.get(Calendar.HOUR_OF_DAY),
+        calendar.get(Calendar.MINUTE),
+        true
+    )
+
+    Row(
+        modifier = Modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = question,
+            modifier = Modifier.weight(1f) //wraps text
+        )
+        Text(
+            text = timeText,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .clickable { timePickerDialog.show() }
+                .padding(16.dp)
+        )
+    }
+}
 
 @Composable
 fun SaveButton(){
+
+    val context = LocalContext.current
+
+    Button(
+        onClick = {
+            val sharedPref = context.getSharedPreferences("SavedLOL", Context.MODE_PRIVATE).edit()
+
+            sharedPref.putString("biggest meal", // biggest meal answer
+        },
+    ) {
+        Text("Save Values")
+    }
 }
