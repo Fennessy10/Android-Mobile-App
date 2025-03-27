@@ -111,9 +111,30 @@ fun TopAppBar() {
     // Back button handler
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+
+
+
+    // checkbox food composable variables
+    val categories = listOf(
+        "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood",
+        "Poultry", "Fish", "Eggs", "Nuts/Seeds"
+    )
+    var checkedStates by remember { mutableStateOf(List(categories.size) { false }) }
+
+
+    // persona dropdown variables
+    var selectedPersona by remember { mutableStateOf("health devotee") }
+
+
+    // time composable variables
     var biggestMealTimeResponse by remember { mutableStateOf("Click to Select Time") }
     var bedTimeResponse by remember { mutableStateOf("Click to Select Time") }
     var wakeTimeResponse by remember { mutableStateOf("Click to Select Time") }
+
+
+
+
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -149,9 +170,11 @@ fun TopAppBar() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            FoodCategories()
+            FoodCategories(checkedStates, onCheckListChange = { newList -> checkedStates = newList })
             PersonaView()
-            PersonaDropdown()
+            PersonaDropdown(selectedOption = selectedPersona, onPersonaSelected = { newPersona -> selectedPersona = newPersona
+                }
+            )
             Timings("What time of day do you normally eat your biggest meal?", biggestMealTimeResponse, onTimeSelected = { biggestMealTimeResponse = it })
             Timings("What time of day do you go to sleep at night?", bedTimeResponse, onTimeSelected = { bedTimeResponse = it })
             Timings("What time of day do you wake up in the morning?", wakeTimeResponse, onTimeSelected = { wakeTimeResponse = it })
@@ -161,15 +184,12 @@ fun TopAppBar() {
     }
 }
 
+
 @Composable
-fun FoodCategories() {
-    val categories = listOf(
-        "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood",
-        "Poultry", "Fish", "Eggs", "Nuts/Seeds"
-    )
-
-    var checkedStates by remember { mutableStateOf(List(categories.size) { false }) }
-
+fun FoodCategories(
+    checkedStates: List<Boolean>,
+    onCheckListChange: (List<Boolean>) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.Start
@@ -182,74 +202,81 @@ fun FoodCategories() {
             )
         )
 
-        // Row 1: Fruits, Vegetables
+        // Helper function to update specific index
+        fun updateState(index: Int, checked: Boolean) {
+            val newList = checkedStates.toMutableList().apply {
+                this[index] = checked
+            }
+            onCheckListChange(newList)
+        }
+
+        // Row 1: Fruits (0), Vegetables (1)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = checkedStates[0],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[0] = it } }
+                onCheckedChange = { updateState(0, it) }
             )
             Text("Fruits")
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(Modifier.width(16.dp))
             Checkbox(
                 checked = checkedStates[1],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[1] = it } }
+                onCheckedChange = { updateState(1, it) }
             )
             Text("Vegetables")
         }
 
-        // Row 2: Red Meat, Seafood
+        // Row 2: Red Meat (3), Seafood (4)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = checkedStates[3],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[3] = it } }
+                onCheckedChange = { updateState(3, it) }
             )
             Text("Red Meat")
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(Modifier.width(16.dp))
             Checkbox(
                 checked = checkedStates[4],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[4] = it } }
+                onCheckedChange = { updateState(4, it) }
             )
             Text("Seafood")
         }
 
-        // Row 3: Fish, Eggs, Nuts/Seeds
+        // Row 3: Fish (6), Eggs (7), Nuts/Seeds (8)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = checkedStates[6],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[6] = it } }
+                onCheckedChange = { updateState(6, it) }
             )
             Text("Fish")
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(Modifier.width(16.dp))
             Checkbox(
                 checked = checkedStates[7],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[7] = it } }
+                onCheckedChange = { updateState(7, it) }
             )
             Text("Eggs")
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(Modifier.width(16.dp))
             Checkbox(
                 checked = checkedStates[8],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[8] = it } }
+                onCheckedChange = { updateState(8, it) }
             )
             Text("Nuts/Seeds")
         }
 
-        // Row 4: Grains, Poultry
+        // Row 4: Grains (2), Poultry (5)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = checkedStates[2],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[2] = it } }
+                onCheckedChange = { updateState(2, it) }
             )
             Text("Grains")
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(Modifier.width(16.dp))
             Checkbox(
                 checked = checkedStates[5],
-                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[5] = it } }
+                onCheckedChange = { updateState(5, it) }
             )
             Text("Poultry")
         }
     }
 }
-
 
 
 
@@ -377,28 +404,26 @@ fun getPersonaImageResource(persona: String?): Int {
 }
 
 @Composable
-fun PersonaDropdown(){
+fun PersonaDropdown(selectedOption: String, onPersonaSelected: (String) -> Unit) {
     val options = listOf("Health Devotee", "Mindful Eater", "Wellness Striver", "Balance Seeker", "Health Procrastinator", "Food Carefree")
-    var expanded by remember { mutableStateOf(false) } // boolean for whether the dropdown is dropped or not
-    var selectedOption by remember { mutableStateOf(options[0]) } // remembers selected option
+    var expanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier.padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         Text("Select your persona:")
 
         Box {
             Text(
-                text = selectedOption ?: "Click to select an option",
+                text = selectedOption.ifEmpty { "Click to select an option" },
                 modifier = Modifier
                     .clickable { expanded = true }
                     .padding(16.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
+
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
@@ -407,7 +432,7 @@ fun PersonaDropdown(){
                     DropdownMenuItem(
                         text = { Text(option) },
                         onClick = {
-                            selectedOption = option
+                            onPersonaSelected(option)
                             expanded = false
                         }
                     )
