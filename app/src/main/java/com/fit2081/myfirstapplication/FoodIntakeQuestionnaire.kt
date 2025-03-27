@@ -28,7 +28,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -42,11 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -55,15 +49,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -72,7 +61,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 
@@ -123,6 +111,10 @@ fun TopAppBar() {
     // Back button handler
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+    var biggestMealTimeResponse by remember { mutableStateOf("Click to Select Time") }
+    var bedTimeResponse by remember { mutableStateOf("Click to Select Time") }
+    var wakeTimeResponse by remember { mutableStateOf("Click to Select Time") }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -160,9 +152,9 @@ fun TopAppBar() {
             FoodCategories()
             PersonaView()
             PersonaDropdown()
-            Timings("What time of day do you normally eat your biggest meal?")
-            Timings("What time of day do you go to sleep at night?")
-            Timings("What time of day do you wake up in the morning?")
+            Timings("What time of day do you normally eat your biggest meal?", biggestMealTimeResponse, onTimeSelected = { biggestMealTimeResponse = it })
+            Timings("What time of day do you go to sleep at night?", bedTimeResponse, onTimeSelected = { bedTimeResponse = it })
+            Timings("What time of day do you wake up in the morning?", wakeTimeResponse, onTimeSelected = { wakeTimeResponse = it })
             Spacer(modifier = Modifier.height(8.dp))
             SaveButton()
         }
@@ -171,15 +163,12 @@ fun TopAppBar() {
 
 @Composable
 fun FoodCategories() {
-    var checkedFruits by remember { mutableStateOf(false) }
-    var checkedVegetables by remember { mutableStateOf(false) }
-    var checkedGrains by remember { mutableStateOf(false) }
-    var checkedRedMeat by remember { mutableStateOf(false) }
-    var checkedSeafood by remember { mutableStateOf(false) }
-    var checkedPoultry by remember { mutableStateOf(false) }
-    var checkedFish by remember { mutableStateOf(false) }
-    var checkedEggs by remember { mutableStateOf(false) }
-    var checkedNutsSeeds by remember { mutableStateOf(false) }
+    val categories = listOf(
+        "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood",
+        "Poultry", "Fish", "Eggs", "Nuts/Seeds"
+    )
+
+    var checkedStates by remember { mutableStateOf(List(categories.size) { false }) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -193,42 +182,74 @@ fun FoodCategories() {
             )
         )
 
+        // Row 1: Fruits, Vegetables
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = checkedFruits, onCheckedChange = { checkedFruits = it })
+            Checkbox(
+                checked = checkedStates[0],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[0] = it } }
+            )
             Text("Fruits")
             Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedVegetables, onCheckedChange = { checkedVegetables = it })
+            Checkbox(
+                checked = checkedStates[1],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[1] = it } }
+            )
             Text("Vegetables")
         }
 
+        // Row 2: Red Meat, Seafood
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = checkedRedMeat, onCheckedChange = { checkedRedMeat = it })
+            Checkbox(
+                checked = checkedStates[3],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[3] = it } }
+            )
             Text("Red Meat")
             Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedSeafood, onCheckedChange = { checkedSeafood = it })
+            Checkbox(
+                checked = checkedStates[4],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[4] = it } }
+            )
             Text("Seafood")
         }
 
+        // Row 3: Fish, Eggs, Nuts/Seeds
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = checkedFish, onCheckedChange = { checkedFish = it })
+            Checkbox(
+                checked = checkedStates[6],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[6] = it } }
+            )
             Text("Fish")
             Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedEggs, onCheckedChange = { checkedEggs = it })
+            Checkbox(
+                checked = checkedStates[7],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[7] = it } }
+            )
             Text("Eggs")
             Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedNutsSeeds, onCheckedChange = { checkedNutsSeeds = it })
+            Checkbox(
+                checked = checkedStates[8],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[8] = it } }
+            )
             Text("Nuts/Seeds")
         }
 
+        // Row 4: Grains, Poultry
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = checkedGrains, onCheckedChange = { checkedGrains = it })
+            Checkbox(
+                checked = checkedStates[2],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[2] = it } }
+            )
             Text("Grains")
             Spacer(modifier = Modifier.width(16.dp))
-            Checkbox(checked = checkedPoultry, onCheckedChange = { checkedPoultry = it })
+            Checkbox(
+                checked = checkedStates[5],
+                onCheckedChange = { checkedStates = checkedStates.toMutableList().apply { this[5] = it } }
+            )
             Text("Poultry")
         }
     }
 }
+
 
 
 
@@ -397,16 +418,14 @@ fun PersonaDropdown(){
 }
 
 @Composable
-fun Timings(question: String) {
+fun Timings(question: String, timeText: String, onTimeSelected: (String) -> Unit) { //uses a lambda to allow the variable to be updated even outside of this function when changed
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-
-    var timeText by remember { mutableStateOf("Click to Select Time") }
 
     val timePickerDialog = TimePickerDialog(
         context,
         { _: TimePicker, hourOfDay: Int, minute: Int ->
-            timeText = String.format("%02d:%02d", hourOfDay, minute)
+            onTimeSelected(String.format("%02d:%02d", hourOfDay, minute)) // Call function to update state
         },
         calendar.get(Calendar.HOUR_OF_DAY),
         calendar.get(Calendar.MINUTE),
@@ -441,7 +460,7 @@ fun SaveButton(){
         onClick = {
             val sharedPref = context.getSharedPreferences("SavedLOL", Context.MODE_PRIVATE).edit()
 
-            sharedPref.putString("biggest meal", // biggest meal answer
+            sharedPref.putString("biggest meal", timeText)// biggest meal answer
         },
     ) {
         Text("Save Values")
