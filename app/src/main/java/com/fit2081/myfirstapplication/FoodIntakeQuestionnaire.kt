@@ -183,7 +183,7 @@ fun TopAppBar() {
 
                     sharedPref.putString("selected persona", selectedPersona)
 
-                    sharedPref.putString("checked foods", checkedStatesString)
+                    sharedPref.putString("checked foods", checkedStates.joinToString(",") { it.toString() })
 
                     sharedPref.apply()
                 },
