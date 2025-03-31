@@ -385,7 +385,12 @@ fun PersonaView() {
             },
             text = { Text(selectedDescription ?: "") },
             confirmButton = {
-                Button(onClick = { showDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))) {
+                Button(
+                    onClick = {
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+                ) {
                     Text("Dismiss", color = Color.White)
                 }
             }
@@ -400,7 +405,7 @@ fun PersonaButton(label: String, buttonColors: ButtonColors, onClick: () -> Unit
         colors = buttonColors,
         modifier = Modifier.padding(4.dp)
     ) {
-        Text(label, color = androidx.compose.ui.graphics.Color.White)
+        Text(label, color = Color.White)
     }
 }
 
