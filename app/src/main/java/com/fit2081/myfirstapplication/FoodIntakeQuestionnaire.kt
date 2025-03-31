@@ -111,16 +111,12 @@ fun TopAppBar() {
     // Back button handler
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-
-
-
     // checkbox food composable variables
     val categories = listOf(
         "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood",
         "Poultry", "Fish", "Eggs", "Nuts/Seeds"
     )
     var checkedStates by remember { mutableStateOf(List(categories.size) { false }) }
-
 
     // persona dropdown variables
     var selectedPersona by remember { mutableStateOf("health devotee") }
@@ -132,6 +128,12 @@ fun TopAppBar() {
     var wakeTimeResponse by remember { mutableStateOf("Click to Select Time") }
 
 
+    // getting variables from shared pref
+    val context = LocalContext.current
+
+    val sharedPref = context.getSharedPreferences("Questionnaire", Context.MODE_PRIVATE)
+
+    val checkedStatesString = sharedPref.getString("checked foods", checkedStates.joinToString(",") { it.toString() })
 
 
 
@@ -179,7 +181,29 @@ fun TopAppBar() {
             Timings("What time of day do you go to sleep at night?", bedTimeResponse, onTimeSelected = { bedTimeResponse = it })
             Timings("What time of day do you wake up in the morning?", wakeTimeResponse, onTimeSelected = { wakeTimeResponse = it })
             Spacer(modifier = Modifier.height(8.dp))
-            SaveButton()
+
+
+
+            Button(
+                onClick = {
+                    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers", Context.MODE_PRIVATE).edit()
+
+                    sharedPref.putString("biggest meal time", biggestMealTimeResponse)// biggest meal answer
+                    sharedPref.putString("bedtime", bedTimeResponse)
+                    sharedPref.putString("wake time", wakeTimeResponse)
+
+                    sharedPref.putString("selected persona", selectedPersona)
+
+                    sharedPref.putString("checked foods", checkedStatesString)
+
+
+                    sharedPref.apply()
+
+
+                },
+            ) {
+                Text("Save Values")
+            }
         }
     }
 }
@@ -443,7 +467,7 @@ fun PersonaDropdown(selectedOption: String, onPersonaSelected: (String) -> Unit)
 }
 
 @Composable
-fun Timings(question: String, timeText: String, onTimeSelected: (String) -> Unit) { //uses a lambda to allow the variable to be updated even outside of this function when changed
+fun Timings(question: String, timeText: String, onTimeSelected: (String) -> Unit) { //uses a callback to allow the variable to be updated even outside of this function when changed
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
@@ -476,18 +500,3 @@ fun Timings(question: String, timeText: String, onTimeSelected: (String) -> Unit
     }
 }
 
-@Composable
-fun SaveButton(){
-
-    val context = LocalContext.current
-
-    Button(
-        onClick = {
-            val sharedPref = context.getSharedPreferences("SavedLOL", Context.MODE_PRIVATE).edit()
-
-            sharedPref.putString("biggest meal", timeText)// biggest meal answer
-        },
-    ) {
-        Text("Save Values")
-    }
-}
