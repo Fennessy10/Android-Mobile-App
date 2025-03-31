@@ -88,17 +88,6 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
     }
 }
 
-//@Composable
-//fun Title(){
-//    Text(
-//        "Food Intake Questionnaire",
-//        style = TextStyle(
-//            fontSize = (20.sp),
-//            fontWeight = (FontWeight.Bold)
-//        )
-//    )
-//}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar() {
@@ -116,26 +105,26 @@ fun TopAppBar() {
         "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood",
         "Poultry", "Fish", "Eggs", "Nuts/Seeds"
     )
-    var checkedStates by remember { mutableStateOf(List(categories.size) { false }) }
-
-    // persona dropdown variables
-    var selectedPersona by remember { mutableStateOf("health devotee") }
 
 
-    // time composable variables
-    var biggestMealTimeResponse by remember { mutableStateOf("Click to Select Time") }
-    var bedTimeResponse by remember { mutableStateOf("Click to Select Time") }
-    var wakeTimeResponse by remember { mutableStateOf("Click to Select Time") }
-
-
-    // getting variables from shared pref
+    // getting shared pref context
     val context = LocalContext.current
-
     val sharedPref = context.getSharedPreferences("Questionnaire", Context.MODE_PRIVATE)
 
-    val checkedStatesString = sharedPref.getString("checked foods", checkedStates.joinToString(",") { it.toString() })
+    // creates default value in-case sharedpref retrieval fails
+    val defaultCheckedStates = List(categories.size) { false }
+    //shared pref retrieval
+    val checkedStatesString = sharedPref.getString("checked foods", defaultCheckedStates.joinToString(",") { it.toString() })
+    // convert back to boolean to be used in food categories function
+    var checkedStates = checkedStatesString?.split(",")?.map { it.toBoolean() } ?: List(categories.size) { false }
 
+// Time composable variables
+    var biggestMealTimeResponse = sharedPref.getString("biggest meal time", "Click to Select Time") ?: "Click to Select Time"
+    var bedTimeResponse = sharedPref.getString("bedtime", "Click to Select Time") ?: "Click to Select Time"
+    var wakeTimeResponse = sharedPref.getString("wake time", "Click to Select Time") ?: "Click to Select Time"
 
+// Selected persona variable
+    var selectedPersona = sharedPref.getString("selected persona", "health devotee") ?: "health devotee"
 
 
     Scaffold(
@@ -196,10 +185,7 @@ fun TopAppBar() {
 
                     sharedPref.putString("checked foods", checkedStatesString)
 
-
                     sharedPref.apply()
-
-
                 },
             ) {
                 Text("Save Values")
