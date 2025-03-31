@@ -116,15 +116,15 @@ fun TopAppBar() {
     //shared pref retrieval
     val checkedStatesString = sharedPref.getString("checked foods", defaultCheckedStates.joinToString(",") { it.toString() })
     // convert back to boolean to be used in food categories function
-    var checkedStates = checkedStatesString?.split(",")?.map { it.toBoolean() } ?: List(categories.size) { false }
+    var checkedStates by remember { mutableStateOf(checkedStatesString?.split(",")?.map { it.toBoolean() } ?: List(categories.size) { false }) }
 
-// Time composable variables
-    var biggestMealTimeResponse = sharedPref.getString("biggest meal time", "Click to Select Time") ?: "Click to Select Time"
-    var bedTimeResponse = sharedPref.getString("bedtime", "Click to Select Time") ?: "Click to Select Time"
-    var wakeTimeResponse = sharedPref.getString("wake time", "Click to Select Time") ?: "Click to Select Time"
+    // Time composable variables
+    var biggestMealTimeResponse by remember { mutableStateOf(sharedPref.getString("biggest meal time", "Click to Select Time") ?: "Click to Select Time") }
+    var bedTimeResponse by remember { mutableStateOf(sharedPref.getString("bedtime", "Click to Select Time") ?: "Click to Select Time") }
+    var wakeTimeResponse by remember { mutableStateOf(sharedPref.getString("wake time", "Click to Select Time") ?: "Click to Select Time") }
 
-// Selected persona variable
-    var selectedPersona = sharedPref.getString("selected persona", "health devotee") ?: "health devotee"
+    // Selected persona variable
+    var selectedPersona by remember { mutableStateOf(sharedPref.getString("selected persona", "health devotee") ?: "health devotee") }
 
 
     Scaffold(
