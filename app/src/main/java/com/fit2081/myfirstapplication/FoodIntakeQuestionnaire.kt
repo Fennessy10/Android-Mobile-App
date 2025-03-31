@@ -109,7 +109,7 @@ fun TopAppBar() {
 
     // getting shared pref context
     val context = LocalContext.current
-    val sharedPref = context.getSharedPreferences("Questionnaire", Context.MODE_PRIVATE)
+    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers", Context.MODE_PRIVATE)
 
     // creates default value in-case sharedpref retrieval fails
     val defaultCheckedStates = List(categories.size) { false }
