@@ -4,6 +4,7 @@ import android.app.TimePickerDialog
 import android.widget.TimePicker
 import java.util.Calendar
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -186,6 +187,8 @@ fun TopAppBar() {
                     sharedPref.putString("checked foods", checkedStates.joinToString(",") { it.toString() })
 
                     sharedPref.apply()
+                    val intent = Intent(context, Home::class.java)
+                    context.startActivity(intent)
                 },
             ) {
                 Text("Save Values")
@@ -383,7 +386,7 @@ fun PersonaView() {
             text = { Text(selectedDescription ?: "") },
             confirmButton = {
                 Button(onClick = { showDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))) {
-                    Text("Dismiss", color = androidx.compose.ui.graphics.Color.White)
+                    Text("Dismiss", color = Color.White)
                 }
             }
         )
