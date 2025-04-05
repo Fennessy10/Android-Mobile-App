@@ -42,13 +42,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -62,6 +67,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 
@@ -72,12 +78,21 @@ class Home : ComponentActivity() {
         setContent {
             MyFirstApplicationTheme {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     innerPadding ->
                     Column (Modifier.padding(innerPadding)){
-                        Greeting("Patrick", Modifier.padding(innerPadding))
-                        Questionnaire(Modifier.padding(innerPadding))
+                        Greeting("Patrick")
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Questionnaire()
+                        MainImage()
+                        Scores(modifier = Modifier, "80/100")
+                        Spacer(modifier = Modifier.height(12.dp))
+                        ScoreDescription()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        BottomBar()
                     }
 
                 }
@@ -94,7 +109,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 text = "Hello,",
                 color = Color.Gray,
                 style = TextStyle(
-                    fontSize = 15.sp
+                    fontSize = 20.sp
                 )
             )
         }
@@ -102,7 +117,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             Text(
                 text = name,
                 style = TextStyle(
-                    fontSize = 25.sp,
+                    fontSize = 35.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -123,11 +138,12 @@ fun Questionnaire(modifier: Modifier = Modifier){
             Text(
                 "You've already filled in your Food Intake Questionnaire, but you can change the details here:",
                 style = TextStyle(
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 )
             )
 
         }
+        Spacer(modifier = Modifier.width(5.dp))
         Column {
             Button(
                 onClick = {
@@ -136,7 +152,7 @@ fun Questionnaire(modifier: Modifier = Modifier){
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
             )  { Text(
-                "Edit"
+                "Edit Questionnaire"
             ) }
         }
     }
@@ -144,15 +160,204 @@ fun Questionnaire(modifier: Modifier = Modifier){
 
 @Composable
 fun MainImage(){
-
+    Image(
+        painter = painterResource(id = R.drawable.dietcirclediagram),
+        contentDescription = "Diet Circle",
+        modifier = Modifier.size(380.dp)
+    )
 }
 
 @Composable
-fun Scores(){
+fun Scores(modifier: Modifier = Modifier, displayedScore: String){
+    val context = LocalContext.current
+    Column (
+        modifier = modifier,
+    ){
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "My Score",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                ),
+                modifier = Modifier.weight(1f)
 
+            )
+            Button(
+                onClick = {
+                    context.startActivity(Intent(context, Score::class.java))
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+            ) {
+                Text("See all scores")
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Text(
+                displayedScore,
+                color = Color.Blue,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 45.sp
+                ),
+
+            )
+        }
+    }
+}
+
+
+@Composable
+fun ScoreDescription(modifier: Modifier = Modifier){
+    Column (modifier = modifier){
+        Row (
+
+        ){
+            Text(
+                "What is the food Quality Score?",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+        Row (
+
+        ){
+            Text(
+                "Your Food Quality Score provides a snapshot of how well your  eating patterns align with established food guidelines, helping you identify both strengths and opportunities for improvement in your diet.",
+                style = TextStyle(
+                    fontSize = 12.sp
+                )
+            )
+        }
+        Row (
+
+        ){
+            Text(
+                "This personalised measurement considers various food groups including vegetables, fruits, whole grains, and proteins to give you practical insights form making healthier food choices",
+                style = TextStyle(
+                    fontSize = 12.sp
+                )
+            )
+        }
+    }
 }
 
 @Composable
-fun ScoreDescription(){
+fun BottomBar() {
+    val context = LocalContext.current
+    BottomAppBar(
+        modifier = Modifier
+            .height(90.dp)
+            .fillMaxWidth(),
+        content = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(
+                    onClick = {
+                        context.startActivity(Intent(context, Home::class.java))
+                    },
+                    modifier = Modifier
+                        .height(90.dp) // Match BottomAppBar height
+                        .width(90.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.homeicon),
+                            contentDescription = "Go Home",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "Home",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 2.dp) // Small space between icon and text
+                        )
+                    }
+                }
+                IconButton(
+                    onClick = {
+                        context.startActivity(Intent(context, Score::class.java))
+                    },
+                    modifier = Modifier
+                        .height(90.dp) // Match BottomAppBar height
+                        .width(100.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.scoreicon),
+                            contentDescription = "Insights",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "Insights",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 2.dp) // Small space between icon and text
+                        )
+                    }
+                }
+                IconButton( // nutricoach
+                    onClick = { /* TODO */ },
+                    modifier = Modifier
+                        .height(90.dp) // Match BottomAppBar height
+                        .width(100.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.nutricoachicon),
+                            contentDescription = "Nutricoach",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "NutriCoach",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 2.dp) // Small space between icon and text
+                        )
+                    }
+                }
+                IconButton( // settings
+                    onClick = { /* TODO */ },
+                    modifier = Modifier
+                        .height(60.dp) // Match BottomAppBar height
+                        .width(100.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.settingsicon),
+                            contentDescription = "settings",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "Settings",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 2.dp) // Small space between icon and text
+                        )
+                    }
+                }
+            }
 
+        }
+    )
 }

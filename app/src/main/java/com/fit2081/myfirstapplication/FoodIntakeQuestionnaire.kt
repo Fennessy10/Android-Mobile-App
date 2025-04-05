@@ -64,7 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
-
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 class FoodIntakeQuestionnaire : ComponentActivity() {
@@ -159,8 +159,8 @@ fun TopAppBar() {
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FoodCategories(checkedStates, onCheckListChange = { newList -> checkedStates = newList })
             PersonaView()
@@ -190,6 +190,7 @@ fun TopAppBar() {
                     val intent = Intent(context, Home::class.java)
                     context.startActivity(intent)
                 },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
             ) {
                 Text("Save Values")
             }
@@ -205,7 +206,7 @@ fun FoodCategories(
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             "Tick the food categories you can eat",
@@ -373,7 +374,10 @@ fun PersonaView() {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Image(
                         painter = painterResource(id = getPersonaImageResource(selectedPersona)),
                         contentDescription = "Persona Image",

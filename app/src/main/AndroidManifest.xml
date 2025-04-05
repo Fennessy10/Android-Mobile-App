@@ -13,6 +13,11 @@
         android:theme="@style/Theme.MyFirstApplication"
         tools:targetApi="31">
         <activity
+            android:name=".Score"
+            android:exported="false"
+            android:label="@string/title_activity_score"
+            android:theme="@style/Theme.MyFirstApplication" />
+        <activity
             android:name=".Home"
             android:exported="false"
             android:label="@string/title_activity_home"
