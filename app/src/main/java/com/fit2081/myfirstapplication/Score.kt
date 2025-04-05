@@ -115,17 +115,17 @@ fun Title(){
 @Composable
 fun MainScores(){
     Column {
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Fruits", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Fruits", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
+//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
 
 
         Row {
