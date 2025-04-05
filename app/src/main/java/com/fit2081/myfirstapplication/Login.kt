@@ -96,7 +96,6 @@ fun LoginScreen() {
                     readOnly = true,
                     label = { Text("User ID") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
@@ -134,7 +133,10 @@ fun LoginScreen() {
                     val isValid = userData[selectedUserId]?.equals(phoneInput) ?: false
                     if (isValid) {
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                        context.startActivity(Intent(context, FoodIntakeQuestionnaire::class.java))
+                        val intent = Intent(context, FoodIntakeQuestionnaire::class.java).apply {
+                            putExtra("USER_ID", selectedUserId)  // add user ID to intent
+                        }
+                        context.startActivity(intent)
                     } else {
                         Toast.makeText(context, "Invalid Phone Number", Toast.LENGTH_SHORT).show()
                     }

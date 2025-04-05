@@ -80,6 +80,10 @@ import java.io.InputStreamReader
 class Score : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Retrieve the user ID from the intent
+        val userId = intent.getStringExtra("USER_ID") ?: ""
+
         enableEdgeToEdge()
         setContent {
             MyFirstApplicationTheme {

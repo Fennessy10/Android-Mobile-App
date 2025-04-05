@@ -70,6 +70,10 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 class FoodIntakeQuestionnaire : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // retrieve the user ID from the intent
+        val userId = intent.getStringExtra("USER_ID") ?: ""
+
         enableEdgeToEdge()
         setContent {
             MyFirstApplicationTheme {
@@ -81,7 +85,7 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
-                        TopAppBar()
+                        TopAppBar(userId)
                     }
                 }
             }
@@ -91,7 +95,7 @@ class FoodIntakeQuestionnaire : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar() {
+fun TopAppBar(userId: String) {
     // Create a scroll state for the content
     val scrollState = rememberScrollState()
 
@@ -110,7 +114,7 @@ fun TopAppBar() {
 
     // getting shared pref context
     val context = LocalContext.current
-    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers", Context.MODE_PRIVATE)
+    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers$userId", Context.MODE_PRIVATE)
 
     // creates default value in-case sharedpref retrieval fails
     val defaultCheckedStates = List(categories.size) { false }
@@ -176,7 +180,7 @@ fun TopAppBar() {
 
             Button(
                 onClick = {
-                    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers", Context.MODE_PRIVATE).edit()
+                    val sharedPref = context.getSharedPreferences("QuestionnaireAnswers$userId", Context.MODE_PRIVATE).edit()
 
                     sharedPref.putString("biggest meal time", biggestMealTimeResponse)// biggest meal answer
                     sharedPref.putString("bedtime", bedTimeResponse)
@@ -187,7 +191,9 @@ fun TopAppBar() {
                     sharedPref.putString("checked foods", checkedStates.joinToString(",") { it.toString() })
 
                     sharedPref.apply()
-                    val intent = Intent(context, Home::class.java)
+                    val intent = Intent(context, Home::class.java).apply {
+                        putExtra("USER_ID", userId)  // add user ID to intent
+                    }
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
