@@ -63,7 +63,7 @@ class Login : ComponentActivity() {
 
 }
 
-
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen() {
@@ -91,6 +91,10 @@ fun LoginScreen() {
                 onExpandedChange = { expanded = !expanded }
             ) {
                 TextField(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
                     value = selectedUserId,
                     onValueChange = {},
                     readOnly = true,

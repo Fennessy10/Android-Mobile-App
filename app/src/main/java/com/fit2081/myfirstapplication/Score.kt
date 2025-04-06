@@ -96,7 +96,7 @@ class Score : ComponentActivity() {
                         Title()
                         MainScores(userId)
                         DisplayHEIFAScores(context, userId)
-                        BottomBar()
+                        BottomBar(userId)
 
                     }
                 }
@@ -258,7 +258,7 @@ fun FoodRow(food: String, sliderValue: MutableState<Float>, sliderMaxRange: Floa
 @Composable
 fun DisplayHEIFAScores(context: Context, userId: String) {
     val scores = remember(userId) {
-        getUserHEIFAScores(context, "your_data.csv", userId)
+        getUserHEIFAScores(context, "data.csv", userId)
     }
 
     scores?.let {

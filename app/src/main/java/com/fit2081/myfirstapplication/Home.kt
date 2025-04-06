@@ -74,6 +74,10 @@ import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 class Home : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // retrieve the user ID from the intent
+        val userId = intent.getStringExtra("USER_ID") ?: ""
+
         enableEdgeToEdge()
         setContent {
             MyFirstApplicationTheme {
@@ -86,13 +90,13 @@ class Home : ComponentActivity() {
                     Column (Modifier.padding(innerPadding)){
                         Greeting("Patrick")
                         Spacer(modifier = Modifier.height(12.dp))
-                        Questionnaire()
+                        Questionnaire(modifier = Modifier, userId)
                         MainImage()
-                        Scores(modifier = Modifier, "80/100")
+                        Scores(modifier = Modifier, "80/100", userId)
                         Spacer(modifier = Modifier.height(12.dp))
                         ScoreDescription()
                         Spacer(modifier = Modifier.height(8.dp))
-                        BottomBar()
+                        BottomBar(userId)
                     }
 
                 }
@@ -126,7 +130,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Questionnaire(modifier: Modifier = Modifier){
+fun Questionnaire(modifier: Modifier = Modifier, userId: String){
     val context = LocalContext.current
     Row(
         modifier = modifier,
@@ -147,7 +151,9 @@ fun Questionnaire(modifier: Modifier = Modifier){
         Column {
             Button(
                 onClick = {
-                    val intent = Intent(context, FoodIntakeQuestionnaire::class.java)
+                    val intent = Intent(context, FoodIntakeQuestionnaire::class.java).apply {
+                        putExtra("USER_ID", userId)  // add user ID to intent
+                    }
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
@@ -168,7 +174,7 @@ fun MainImage(){
 }
 
 @Composable
-fun Scores(modifier: Modifier = Modifier, displayedScore: String){
+fun Scores(modifier: Modifier = Modifier, displayedScore: String, userId: String){
     val context = LocalContext.current
     Column (
         modifier = modifier,
@@ -185,7 +191,10 @@ fun Scores(modifier: Modifier = Modifier, displayedScore: String){
             )
             Button(
                 onClick = {
-                    context.startActivity(Intent(context, Score::class.java))
+                    val intent = Intent(context, Score::class.java).apply {
+                        putExtra("USER_ID", userId)  // add user ID to intent
+                    }
+                    context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
             ) {
@@ -249,7 +258,7 @@ fun ScoreDescription(modifier: Modifier = Modifier){
 }
 
 @Composable
-fun BottomBar() {
+fun BottomBar(userId: String) {
     val context = LocalContext.current
     BottomAppBar(
         modifier = Modifier
@@ -262,7 +271,10 @@ fun BottomBar() {
             ) {
                 IconButton(
                     onClick = {
-                        context.startActivity(Intent(context, Home::class.java))
+                        val intent = Intent(context, Home::class.java).apply {
+                            putExtra("USER_ID", userId)  // add user ID to intent
+                        }
+                        context.startActivity(intent)
                     },
                     modifier = Modifier
                         .height(90.dp) // Match BottomAppBar height
@@ -287,7 +299,10 @@ fun BottomBar() {
                 }
                 IconButton(
                     onClick = {
-                        context.startActivity(Intent(context, Score::class.java))
+                        val intent = Intent(context, Score::class.java).apply {
+                            putExtra("USER_ID", userId)  // add user ID to intent
+                        }
+                        context.startActivity(intent)
                     },
                     modifier = Modifier
                         .height(90.dp) // Match BottomAppBar height
