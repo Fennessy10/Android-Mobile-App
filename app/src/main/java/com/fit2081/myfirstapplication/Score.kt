@@ -87,16 +87,16 @@ class Score : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyFirstApplicationTheme {
+
+                val context = LocalContext.current
+
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     innerPadding ->
                     Column (Modifier.padding(innerPadding)){
                         Title()
-                        MainScores()
+                        MainScores(userId)
+                        DisplayHEIFAScores(context, userId)
                         BottomBar()
-                        CSVProcessorScreen(
-                            context = LocalContext.current,
-                            modifier = Modifier.padding(innerPadding)
-                        )
 
                     }
                 }
@@ -117,7 +117,7 @@ fun Title(){
 }
 
 @Composable
-fun MainScores(){
+fun MainScores(userId: String){
     Column {
 //        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
 //        FoodRow("Fruits", remember { mutableFloatStateOf(10f) }, 5f)
@@ -243,7 +243,8 @@ fun FoodRow(food: String, sliderValue: MutableState<Float>, sliderMaxRange: Floa
         Slider(
             value = sliderValue.value,
             onValueChange = { sliderValue.value = it },
-            valueRange = 0f..sliderMaxRange
+            valueRange = 0f..sliderMaxRange,
+            enabled = false  // this makes the slider non-interactive
         )
         Text(
             text = "${sliderValue.value}/${sliderMaxRange}",
@@ -254,83 +255,145 @@ fun FoodRow(food: String, sliderValue: MutableState<Float>, sliderMaxRange: Floa
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-// Composable function for the main screen of the CSV processor.
-fun CSVProcessorScreen(context: Context, modifier: Modifier = Modifier) {
-    // State to hold the location input.
-    var location by remember { mutableStateOf("") }
-    // State to hold the count of rows matching the location.
-    var count by remember { mutableStateOf(0) }
-    // State to hold the text to display the result.
-    var resultText by remember { mutableStateOf("Result: 0") }
-    // Column to arrange UI elements vertically.
-    Column(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center
-    ) {
-        // Text field for entering the location.
-        TextField(
-            value = location,
-            // Update location state when the text changes.
-            onValueChange = { location = it },
-            label = { Text("Enter Location") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-        // Spacer for adding vertical space.
-        Spacer(modifier = Modifier.height(16.dp))
-        // Button to process the CSV.
-        Button(
-            onClick = {
-                // Call the function to count rows matching the location.
-                // the second parameter is the file name that should be saved in
-                // app/src/main/assets/data.csv
-                count = countRowsByLocation(context, "data.csv", location)
-                // Update the result text to show the count.
-                resultText = "Result: $count"
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Process CSV")
+fun DisplayHEIFAScores(context: Context, userId: String) {
+    val scores = remember(userId) {
+        getUserHEIFAScores(context, "your_data.csv", userId)
+    }
+
+    scores?.let {
+        Column {
+            Text("Total HEIFA Score: ${it["total"]}")
+            Text("Vegetables: ${it["vegetables"]}")
+            Text("Fruit: ${it["fruit"]}")
+            Text("Grains & Cereals: ${it["grainsCereals"]}")
+            // Add other score displays as needed...
         }
-        // Spacer for adding vertical space.
-        Spacer(modifier = Modifier.height(16.dp))
-        // Text to display the result.
-        Text(text = resultText)
+    } ?: Text("User not found or error loading data")
+}
+
+fun getUserHEIFAScores(context: Context, fileName: String, userId: String): Map<String, Float>? {
+    return try {
+        context.assets.open(fileName).use { inputStream ->
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val lines = reader.readLines()
+
+            val header = lines.first().split(",")
+            val userRow = lines.find { it.split(",").getOrNull(1)?.trim() == userId.trim() }
+                ?: return null
+
+            val columns = userRow.split(",")
+            val sex = columns.getOrNull(2) ?: return null
+            val isMale = sex.equals("male", ignoreCase = true)
+
+            fun getScore(prefix: String): Float {
+                val suffix = if (isMale) "Male" else "Female"
+                val columnName = "${prefix}HEIFAscore$suffix"
+                val index = header.indexOf(columnName)
+                return columns.getOrNull(index)?.toFloatOrNull() ?: 0f
+            }
+
+            mapOf(
+                "total" to (columns[header.indexOf(if (isMale) "HEIFAtotalscoreMale" else "HEIFAtotalscoreFemale")]
+                    .toFloatOrNull() ?: 0f),
+                "vegetables" to getScore("Vegetables"),
+                "fruit" to getScore("Fruit"),
+                "grainsCereals" to getScore("Grainsandcereals"),
+                "wholeGrains" to getScore("Wholegrains"),
+                "meatAlternatives" to getScore("Meatandalternatives"),
+                "dairyAlternatives" to getScore("Dairyandalternatives"),
+                "sodium" to getScore("Sodium"),
+                "alcohol" to getScore("Alcohol"),
+                "water" to getScore("Water"),
+                "sugar" to getScore("Sugar"),
+                "saturatedFat" to getScore("SaturatedFat"),
+                "unsaturatedFat" to getScore("UnsaturatedFat")
+            )
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }
 
-// Function to count the number of rows in a CSV file that match a given location.
-fun countRowsByLocation(context: Context, fileName: String, location: String): Int {
-    var count = 0 // Initialize the count to 0.
-    var assets = context.assets // Get the asset manager.
-    // Try to open the CSV file and read it line by line.
-    try {
-        val inputStream = assets.open(fileName) // Open the file from assets.
-        // Create a buffered reader for efficient reading.
-        val reader = BufferedReader(InputStreamReader(inputStream))
-        reader.useLines { lines ->
-            lines.drop(1).forEach { line -> // Skip the header row.
-                val values = line.split(",") // Split each line into values.
-                // Check if the row has enough columns and
-                // if the 7th column matches the location.
-                if (values.size > 6 && values[7].trim() == location.trim()) {
-                    count++ // Increment the count if the location matches.
-                }
-            }
-        }
-    } catch (e: Exception) {
-        // Handle any exceptions that might occur during file reading.
-    }
-    // Return the total count of rows matching the location.
-    return count
-}
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//// Composable function for the main screen of the CSV processor.
+//fun CSVProcessorScreen(context: Context, modifier: Modifier = Modifier) {
+//    // State to hold the location input.
+//    var location by remember { mutableStateOf("") }
+//    // State to hold the count of rows matching the location.
+//    var count by remember { mutableStateOf(0) }
+//    // State to hold the text to display the result.
+//    var resultText by remember { mutableStateOf("Result: 0") }
+//    // Column to arrange UI elements vertically.
+//    Column(
+//        modifier = modifier
+//            .padding(16.dp)
+//            .fillMaxSize(),
+//        verticalArrangement = Arrangement.Center
+//    ) {
+//        // Text field for entering the location.
+//        TextField(
+//            value = location,
+//            // Update location state when the text changes.
+//            onValueChange = { location = it },
+//            label = { Text("Enter Location") },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(bottom = 16.dp)
+//        )
+//        // Spacer for adding vertical space.
+//        Spacer(modifier = Modifier.height(16.dp))
+//        // Button to process the CSV.
+//        Button(
+//            onClick = {
+//                // Call the function to count rows matching the location.
+//                // the second parameter is the file name that should be saved in
+//                // app/src/main/assets/data.csv
+//                count = countRowsByLocation(context, "data.csv", location)
+//                // Update the result text to show the count.
+//                resultText = "Result: $count"
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(bottom = 16.dp)
+//        ) {
+//            Text("Process CSV")
+//        }
+//        // Spacer for adding vertical space.
+//        Spacer(modifier = Modifier.height(16.dp))
+//        // Text to display the result.
+//        Text(text = resultText)
+//    }
+//}
+//
+//// Function to count the number of rows in a CSV file that match a given location.
+//fun countRowsByLocation(context: Context, fileName: String, location: String): Int {
+//    var count = 0 // Initialize the count to 0.
+//    var assets = context.assets // Get the asset manager.
+//    // Try to open the CSV file and read it line by line.
+//    try {
+//        val inputStream = assets.open(fileName) // Open the file from assets.
+//        // Create a buffered reader for efficient reading.
+//        val reader = BufferedReader(InputStreamReader(inputStream))
+//        reader.useLines { lines ->
+//            lines.drop(1).forEach { line -> // Skip the header row.
+//                val values = line.split(",") // Split each line into values.
+//                // Check if the row has enough columns and
+//                // if the 7th column matches the location.
+//                if (values.size > 6 && values[7].trim() == location.trim()) {
+//                    count++ // Increment the count if the location matches.
+//                }
+//            }
+//        }
+//    } catch (e: Exception) {
+//        // Handle any exceptions that might occur during file reading.
+//    }
+//    // Return the total count of rows matching the location.
+//    return count
+//}
 
 
 
