@@ -64,7 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+
 
 
 class FoodIntakeQuestionnaire : ComponentActivity() {
@@ -210,7 +210,7 @@ fun TopAppBar(userId: String) {
 @Composable
 fun FoodCategories(
     checkedStates: List<Boolean>,
-    onCheckListChange: (List<Boolean>) -> Unit
+    onCheckListChange: (List<Boolean>) -> Unit // callback. -> Unit = function returns null in kotlin
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -226,9 +226,12 @@ fun FoodCategories(
 
         // Helper function to update specific index
         fun updateState(index: Int, checked: Boolean) {
+            // 1. Create a mutable copy of the current state list
             val newList = checkedStates.toMutableList().apply {
+                // 2. Update ONLY the checkbox at the specified index
                 this[index] = checked
             }
+            // 3. Pass the updated list back to the parent
             onCheckListChange(newList)
         }
 
@@ -475,18 +478,28 @@ fun PersonaDropdown(selectedOption: String, onPersonaSelected: (String) -> Unit)
 @Composable
 fun Timings(question: String, timeText: String, onTimeSelected: (String) -> Unit) { //uses a callback to allow the variable to be updated even outside of this function when changed
     val context = LocalContext.current
+// Get an instance of the Calendar class initialized with current date/time
     val calendar = Calendar.getInstance()
 
+// Create a TimePickerDialog for selecting time
     val timePickerDialog = TimePickerDialog(
-        context,
-        { _: TimePicker, hourOfDay: Int, minute: Int ->
-            onTimeSelected(String.format("%02d:%02d", hourOfDay, minute)) // Call function to update state
-        },
-        calendar.get(Calendar.HOUR_OF_DAY),
-        calendar.get(Calendar.MINUTE),
-        true
-    )
+        context, // The context used to display the dialog
 
+        // Lambda callback when time is selected
+        { _: TimePicker, hourOfDay: Int, minute: Int ->
+            // Format the selected time as HH:MM (2-digit padding)
+            // and pass it to the parent composable via callback
+            onTimeSelected(String.format("%02d:%02d", hourOfDay, minute))
+        },
+
+        // Set initial hour to current system hour (24-hour format)
+        calendar.get(Calendar.HOUR_OF_DAY),
+
+        // Set initial minute to current system minute
+        calendar.get(Calendar.MINUTE),
+
+        true // Use 24-hour time format (false would show AM/PM format)
+    )
     Row(
         modifier = Modifier.padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

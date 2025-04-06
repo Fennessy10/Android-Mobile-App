@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,12 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 import androidx.compose.material3.*
@@ -99,7 +95,7 @@ fun LoginScreen() {
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("User ID") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }, //Adds a standard dropdown arrow icon at the right end of the TextField
                 )
 
                 ExposedDropdownMenu(
@@ -125,7 +121,7 @@ fun LoginScreen() {
                 value = phoneInput,
                 onValueChange = { phoneInput = it },
                 label = { Text("Phone Number") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), // adds a keyboard
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -164,24 +160,34 @@ fun LoginScreen() {
     }
 }
 
-// Modified CSV processing function to return a map of User_ID to PhoneNumber
+// Function to read user data from a CSV file and return a mapping of User_ID to PhoneNumber
 fun getUserDataFromCsv(context: Context, fileName: String): Map<String, String> {
     return try {
+        // Open the CSV file from the app's assets folder
         context.assets.open(fileName).use { stream ->
+            // Create a BufferedReader to read the file line by line
             BufferedReader(InputStreamReader(stream)).useLines { lines ->
-                lines.drop(1) // Skip header
+                // Process each line of the CSV file
+                lines.drop(1) // Skip the first line (header row) of the CSV file
                     .mapNotNull { line ->
+                        // Split each line by commas to get individual values
                         val values = line.split(",")
+                        // Check if the line has at least 2 values (PhoneNumber and User_ID)
                         if (values.size >= 2) {
-                            values[0] to values[1] // PhoneNumber to User_ID mapping
+                            // Return a Pair of (PhoneNumber, User_ID) if valid
+                            values[0] to values[1] // Pair format: (PhoneNumber, User_ID)
                         } else {
+                            // Skip malformed lines by returning null
                             null
                         }
                     }
-                    .associate { (phone, userId) -> userId to phone } // Convert to User_ID -> PhoneNumber
+                    // Convert the list of Pairs into a Map where:
+                    // Key = User_ID (values[1]), Value = PhoneNumber (values[0])
+                    .associate { (phone, userId) -> userId to phone }
             }
         }
     } catch (e: Exception) {
+        // Return an empty map if any error occurs (file not found, parsing error, etc.)
         emptyMap()
     }
 }

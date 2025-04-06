@@ -1,20 +1,13 @@
 package com.fit2081.myfirstapplication
 
-import android.app.TimePickerDialog
-import android.widget.TimePicker
-import java.util.Calendar
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,50 +17,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
 import java.io.BufferedReader
@@ -381,27 +347,38 @@ fun BottomBar(userId: String) {
     )
 }
 
+// Function to calculate and format a user's total score from CSV data
 fun getTotalScore(context: Context, userId: String): String {
     return try {
+        // Open the CSV file from app assets
         context.assets.open("data.csv").use { inputStream ->
+            // Create a buffered reader to process the file
             val reader = BufferedReader(InputStreamReader(inputStream))
+            // Read all lines from the CSV file into memory
             val lines = reader.readLines()
 
+            // Find the row matching the specified user ID
             val userRow = lines.find {
+                // Split each line by commas and check if column 1 (index 1) matches userId
                 it.split(",").getOrNull(1)?.trim() == userId.trim()
-            } ?: return "N/A"
+            } ?: return "N/A"  // Return "N/A" if user not found
 
+            // Split the matching row into individual columns
             val columns = userRow.split(",")
+            // Check if user is male (case-insensitive comparison)
             val isMale = columns.getOrNull(2)?.equals("male", true) ?: false
 
-            // Get total score column index based on gender
+            // Get total score from different columns based on gender
+            // Male scores are in column 3 (index 3), female in column 4 (index 4)
             val totalScore = if (isMale) columns[3].toFloat() else columns[4].toFloat()
 
-            // Format as "XX.XX/100"
+            // Format the score as a string with one decimal point (e.g., "85.5/100")
             "%.1f/100".format(totalScore)
         }
     } catch (e: Exception) {
+        // Print stack trace for debugging if any error occurs
         e.printStackTrace()
+        // Return "N/A" as fallback value
         "N/A"
     }
 }
