@@ -90,14 +90,14 @@ class Score : ComponentActivity() {
 
                 val context = LocalContext.current
 
-                Scaffold(modifier = Modifier.fillMaxSize()) {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { BottomBar(userId) }
+                ) {
                     innerPadding ->
                     Column (Modifier.padding(innerPadding)){
                         Title()
-                        MainScores(userId)
                         DisplayHEIFAScores(context, userId)
-                        BottomBar(userId)
-
                     }
                 }
             }
@@ -106,154 +106,55 @@ class Score : ComponentActivity() {
 }
 
 @Composable
-fun Title(){
-    Text(
-        "Insights: Food Score",
-        style = TextStyle(
-            fontSize = 35.sp,
-            fontWeight = FontWeight.Bold
+fun Title() {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Insights: Food Score",
+            style = TextStyle(
+                fontSize = 35.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(vertical = 16.dp)
         )
-    )
-}
-
-@Composable
-fun MainScores(userId: String){
-    Column {
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Fruits", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-//        FoodRow("Vegetables", remember { mutableFloatStateOf(10f) }, 5f)
-
-
-        Row {
-            Text(
-                text = "Fruits",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Grains & Cereals",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Whole Grains",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Meat & Alternatives",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Dairy",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Water",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Unsaturated Fats",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Sodium",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Sugar",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Sugar",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Alcohol",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
-        Row {
-            Text(
-                text = "Discretionary Foods",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                )
-            )
-        }
     }
 }
 
 @Composable
-fun FoodRow(food: String, sliderValue: MutableState<Float>, sliderMaxRange: Float) {
-    Row {
+fun FoodScoreRow(label: String, score: Float, maxScore: Float) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp)
+            .height(40.dp)
+    ) {
         Text(
-            text = food,
-            style = TextStyle(
-                fontSize = 20.sp,
+            text = label,
+            style = TextStyle(fontSize = 18.sp),
+            modifier = Modifier.width(150.dp)
+        )
+        Box(modifier = Modifier.weight(1f)) {
+            Slider(
+                value = score,
+                onValueChange = {},
+                valueRange = 0f..maxScore,
+                enabled = false,
+                modifier = Modifier
+                    .width(160.dp)
+                    .height(24.dp),
             )
-        )
-        Slider(
-            value = sliderValue.value,
-            onValueChange = { sliderValue.value = it },
-            valueRange = 0f..sliderMaxRange,
-            enabled = false  // this makes the slider non-interactive
-        )
+        }
         Text(
-            text = "${sliderValue.value}/${sliderMaxRange}",
-            style = TextStyle(
-                fontSize = 20.sp,
-            )
+            text = "%.1f/%.0f".format(score, maxScore),
+            style = TextStyle(fontSize = 16.sp),
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }
+
 
 @Composable
 fun DisplayHEIFAScores(context: Context, userId: String) {
@@ -262,15 +163,37 @@ fun DisplayHEIFAScores(context: Context, userId: String) {
     }
 
     scores?.let {
-        Column {
-            Text("Total HEIFA Score: ${it["total"]}")
-            Text("Vegetables: ${it["vegetables"]}")
-            Text("Fruit: ${it["fruit"]}")
-            Text("Grains & Cereals: ${it["grainsCereals"]}")
-            // Add other score displays as needed...
+        val maxScores = mapOf(
+            "total" to 100f,
+            "vegetables" to 5f,
+            "fruit" to 5f,
+            "grainsCereals" to 5f,
+            "wholeGrains" to 5f,
+            "meatAlternatives" to 10f,
+            "dairyAlternatives" to 10f,
+            "sodium" to 10f,
+            "alcohol" to 10f,
+            "water" to 5f,
+            "sugar" to 10f,
+            "saturatedFat" to 5f,
+            "unsaturatedFat" to 5f
+        )
+
+        Column(
+            Modifier.padding(16.dp)
+        ) {
+            maxScores.forEach { (label, max) ->
+                val value = it[label] ?: 0f
+                FoodScoreRow(
+                    label = label.replaceFirstChar { it.uppercase() },
+                    score = value,
+                    maxScore = max
+                )
+            }
         }
     } ?: Text("User not found or error loading data")
 }
+
 
 fun getUserHEIFAScores(context: Context, fileName: String, userId: String): Map<String, Float>? {
     return try {
@@ -315,86 +238,6 @@ fun getUserHEIFAScores(context: Context, fileName: String, userId: String): Map<
         null
     }
 }
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//// Composable function for the main screen of the CSV processor.
-//fun CSVProcessorScreen(context: Context, modifier: Modifier = Modifier) {
-//    // State to hold the location input.
-//    var location by remember { mutableStateOf("") }
-//    // State to hold the count of rows matching the location.
-//    var count by remember { mutableStateOf(0) }
-//    // State to hold the text to display the result.
-//    var resultText by remember { mutableStateOf("Result: 0") }
-//    // Column to arrange UI elements vertically.
-//    Column(
-//        modifier = modifier
-//            .padding(16.dp)
-//            .fillMaxSize(),
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        // Text field for entering the location.
-//        TextField(
-//            value = location,
-//            // Update location state when the text changes.
-//            onValueChange = { location = it },
-//            label = { Text("Enter Location") },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(bottom = 16.dp)
-//        )
-//        // Spacer for adding vertical space.
-//        Spacer(modifier = Modifier.height(16.dp))
-//        // Button to process the CSV.
-//        Button(
-//            onClick = {
-//                // Call the function to count rows matching the location.
-//                // the second parameter is the file name that should be saved in
-//                // app/src/main/assets/data.csv
-//                count = countRowsByLocation(context, "data.csv", location)
-//                // Update the result text to show the count.
-//                resultText = "Result: $count"
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(bottom = 16.dp)
-//        ) {
-//            Text("Process CSV")
-//        }
-//        // Spacer for adding vertical space.
-//        Spacer(modifier = Modifier.height(16.dp))
-//        // Text to display the result.
-//        Text(text = resultText)
-//    }
-//}
-//
-//// Function to count the number of rows in a CSV file that match a given location.
-//fun countRowsByLocation(context: Context, fileName: String, location: String): Int {
-//    var count = 0 // Initialize the count to 0.
-//    var assets = context.assets // Get the asset manager.
-//    // Try to open the CSV file and read it line by line.
-//    try {
-//        val inputStream = assets.open(fileName) // Open the file from assets.
-//        // Create a buffered reader for efficient reading.
-//        val reader = BufferedReader(InputStreamReader(inputStream))
-//        reader.useLines { lines ->
-//            lines.drop(1).forEach { line -> // Skip the header row.
-//                val values = line.split(",") // Split each line into values.
-//                // Check if the row has enough columns and
-//                // if the 7th column matches the location.
-//                if (values.size > 6 && values[7].trim() == location.trim()) {
-//                    count++ // Increment the count if the location matches.
-//                }
-//            }
-//        }
-//    } catch (e: Exception) {
-//        // Handle any exceptions that might occur during file reading.
-//    }
-//    // Return the total count of rows matching the location.
-//    return count
-//}
-
 
 
 

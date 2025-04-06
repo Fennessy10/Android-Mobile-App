@@ -136,16 +136,27 @@ fun LoginScreen() {
                 onClick = {
                     val isValid = userData[selectedUserId]?.equals(phoneInput) ?: false
                     if (isValid) {
+                        // Check if questionnaire was completed
+                        val userPrefs = context.getSharedPreferences("QuestionnaireAnswers$selectedUserId", Context.MODE_PRIVATE)
+                        val isQuestionnaireCompleted = userPrefs.getBoolean("questionnaire_completed", false)
+
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(context, FoodIntakeQuestionnaire::class.java).apply {
-                            putExtra("USER_ID", selectedUserId)  // add user ID to intent
+
+                        // Navigate to Home if completed, else Questionnaire
+                        val destination = if (isQuestionnaireCompleted) {
+                            Home::class.java
+                        } else {
+                            FoodIntakeQuestionnaire::class.java
+                        }
+
+                        val intent = Intent(context, destination).apply {
+                            putExtra("USER_ID", selectedUserId)
                         }
                         context.startActivity(intent)
                     } else {
                         Toast.makeText(context, "Invalid Phone Number", Toast.LENGTH_SHORT).show()
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
+                }
             ) {
                 Text("Login")
             }

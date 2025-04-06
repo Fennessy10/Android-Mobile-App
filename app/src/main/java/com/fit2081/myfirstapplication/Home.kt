@@ -70,6 +70,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fit2081.myfirstapplication.ui.theme.MyFirstApplicationTheme
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class Home : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +86,8 @@ class Home : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    bottomBar = { BottomBar(userId) }
                 ) {
                     innerPadding ->
                     Column (Modifier.padding(innerPadding)){
@@ -92,11 +95,10 @@ class Home : ComponentActivity() {
                         Spacer(modifier = Modifier.height(12.dp))
                         Questionnaire(modifier = Modifier, userId)
                         MainImage()
-                        Scores(modifier = Modifier, "80/100", userId)
+                        Scores(modifier = Modifier, userId)
                         Spacer(modifier = Modifier.height(12.dp))
                         ScoreDescription()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        BottomBar(userId)
+
                     }
 
                 }
@@ -174,8 +176,10 @@ fun MainImage(){
 }
 
 @Composable
-fun Scores(modifier: Modifier = Modifier, displayedScore: String, userId: String){
+fun Scores(modifier: Modifier = Modifier, userId: String){
     val context = LocalContext.current
+    val totalScore = remember(userId) { getTotalScore(context, userId) }
+
     Column (
         modifier = modifier,
     ){
@@ -208,7 +212,7 @@ fun Scores(modifier: Modifier = Modifier, displayedScore: String, userId: String
             modifier = Modifier.fillMaxWidth()
         ){
             Text(
-                displayedScore,
+                totalScore,
                 color = Color.Blue,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
@@ -375,4 +379,29 @@ fun BottomBar(userId: String) {
 
         }
     )
+}
+
+fun getTotalScore(context: Context, userId: String): String {
+    return try {
+        context.assets.open("data.csv").use { inputStream ->
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val lines = reader.readLines()
+
+            val userRow = lines.find {
+                it.split(",").getOrNull(1)?.trim() == userId.trim()
+            } ?: return "N/A"
+
+            val columns = userRow.split(",")
+            val isMale = columns.getOrNull(2)?.equals("male", true) ?: false
+
+            // Get total score column index based on gender
+            val totalScore = if (isMale) columns[3].toFloat() else columns[4].toFloat()
+
+            // Format as "XX.XX/100"
+            "%.1f/100".format(totalScore)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        "N/A"
+    }
 }

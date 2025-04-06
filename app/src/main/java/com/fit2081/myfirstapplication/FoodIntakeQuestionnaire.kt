@@ -190,6 +190,8 @@ fun TopAppBar(userId: String) {
 
                     sharedPref.putString("checked foods", checkedStates.joinToString(",") { it.toString() })
 
+                    sharedPref.putBoolean("questionnaire_completed", true) // saves when questionnaire has already been completed
+
                     sharedPref.apply()
                     val intent = Intent(context, Home::class.java).apply {
                         putExtra("USER_ID", userId)  // add user ID to intent
