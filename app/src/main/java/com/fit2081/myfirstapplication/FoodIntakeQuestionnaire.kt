@@ -104,6 +104,9 @@ fun TopAppBar(userId: String) {
 
     // Back button handler
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    // ? is checking if the thing is null.
+    //If it’s not null, access the property.
+    //If it’s null, Kotlin stops there and returns null.
 
     // checkbox food composable variables
     val categories = listOf(
