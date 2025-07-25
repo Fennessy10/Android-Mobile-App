@@ -1,2 +1,4 @@
 # Dietician App
+An Android app developed in Kotlin using Jetpack Compose, built with Android Studio. It’s an app designed to help patients visualise their food quality scores after they have visited a clinician/dietician. 
+
 <img src="https://github.com/Fennessy10/Android-Mobile-App/blob/main/Dietician%20App%20Food%20Nutrition%20Search.png?raw=true" alt="Dietician App Food Nutrition Search" width="200"/> <img src="https://github.com/Fennessy10/Android-Mobile-App/blob/main/Dietician%20App%20Food%20Questionairre.png?raw=true" alt="Dietician App Food Questionairre" width="200"/> <img src="https://github.com/Fennessy10/Android-Mobile-App/blob/main/Dietician%20App%20Food%20Scores.png?raw=true" alt="Dietician App Food Scores" width="200"/> <img src="https://github.com/Fennessy10/Android-Mobile-App/blob/main/Dietician%20App%20HomeScreen.png" alt="Dietician App HomeScreen" width="200"/>
